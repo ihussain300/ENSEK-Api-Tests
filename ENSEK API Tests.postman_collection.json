@@ -1,0 +1,381 @@
+{
+	"info": {
+		"_postman_id": "45a11885-78e3-49fe-be38-e53abe467946",
+		"name": "ENSEK API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20447268"
+	},
+	"item": [
+		{
+			"name": "Get Login Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody)",
+							"",
+							"if(pm.response.status != \"OK\") {",
+							"    postman.setNextRequest(\"Get Login Token\");",
+							"} else {",
+							"    var access_token = jsonData.access_token;",
+							"    pm.globals.set(\"access_token\", access_token);",
+							"}",
+							"",
+							"pm.test(\"Status 200 ok is returned when logging in via login api\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Login response body to contain access token & success message\", () => {",
+							"    pm.expect(jsonData.access_token != null);",
+							"    pm.expect(jsonData.message == \"Success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"test\",\n  \"password\": \"testing\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Energy Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.globals.set(\"electric_energy_id\", jsonData.electric.energy_id);",
+							"pm.globals.set(\"gas_energy_id\", jsonData.gas.energy_id);",
+							"pm.globals.set(\"nuclear_energy_id\", jsonData.nuclear.energy_id);",
+							"pm.globals.set(\"oil_energy_id\", jsonData.oil.energy_id);",
+							"",
+							"pm.test(\"Status code 200 is returned when requesting Energy data\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response body contains properties for all energy types\", () => {",
+							"    pm.expect(jsonData).to.have.property(\"electric\");",
+							"    pm.expect(jsonData).to.have.property(\"gas\");",
+							"    pm.expect(jsonData).to.have.property(\"nuclear\");",
+							"    pm.expect(jsonData).to.have.property(\"oil\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/energy",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"energy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy Electric",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var message = jsonData.message.split(\"id is \");",
+							"",
+							"pm.test(\"Verify you are able to successully buy electric\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.globals.set(\"electric_order_id\", message[1]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/buy/{{electric_energy_id}}/2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"buy",
+						"{{electric_energy_id}}",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy Gas",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var order_id = jsonData.message.split(\"id is \");",
+							"",
+							"pm.test(\"Verify you are able to successully buy gas\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.globals.set(\"gas_order_id\", order_id[1]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/buy/{{gas_energy_id}}/2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"buy",
+						"{{gas_energy_id}}",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy Nuclear",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var order_id = jsonData.message.split(\"id is \");",
+							"",
+							"pm.test(\"Verify you are able to successully buy nuclear\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.globals.set(\"nuclear_order_id\", order_id[1]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/buy/{{nuclear_energy_id}}/2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"buy",
+						"{{nuclear_energy_id}}",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy Oil",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var order_id = jsonData.message.split(\"id is \");",
+							"",
+							"pm.test(\"Verify you are able to successully buy oil\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.globals.set(\"oil_order_id\", order_id[1]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/buy/{{electric_energy_id}}/2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"buy",
+						"{{electric_energy_id}}",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"let responses = pm.response.json()",
+							"var electricOrderId = pm.globals.get(\"electric_order_id\").split(\".\");",
+							"console.log(electricOrderId)",
+							"",
+							"pm.test(\"Status 200 code is returned when retrieving order details\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/orders",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Orders Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Verify data has been reset', () => {",
+							"    const jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.response.to.have.status(200));",
+							"    pm.expect(jsonData.message).to.eql('Success');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/reset",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"reset"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "0"
+		},
+		{
+			"key": "quantity",
+			"value": "0"
+		},
+		{
+			"key": "Id",
+			"value": ""
+		},
+		{
+			"key": "ids",
+			"value": ""
+		}
+	]
+}
